@@ -32,10 +32,10 @@ instance Show Expr where
 vars :: Expr -> [Char]
 vars (Var c) = [c]
 vars (Not e) = vars e
-vars (And l r) = vars l ++ vars r
-vars (Or l r) = vars l ++ vars r
-vars (Cond l r) = vars l ++ vars r
-vars (Bicond l r) = vars l ++ vars r
+vars (And l r) = vars l `union` vars r
+vars (Or l r) = vars l `union` vars r
+vars (Cond l r) = vars l `union` vars r
+vars (Bicond l r) = vars l `union` vars r
 
 type Vals = [(Char, Bool)]
 
