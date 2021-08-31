@@ -36,6 +36,7 @@ executables:
     dependencies:
     - truths
     - parsec
+    - SimpleTableGenerator
 
 tests:
   truths-test:

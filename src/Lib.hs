@@ -3,6 +3,7 @@ module Lib
     vars,
     Vals,
     vals,
+    val,
     eval,
     exprs,
   )
@@ -46,15 +47,6 @@ vals :: [Char] -> [Vals]
 vals [] = [[]]
 vals (c : cs) = [(c, b) : rest | rest <- vals cs, b <- [True, False]]
 
--- | bubbles up internal expressions
-exprs :: Expr -> [Expr]
-exprs (Var c) = [] -- don't keep plain vars; covered in vars
-exprs (Not e) = Not e : exprs e
-exprs (And l r) = And l r : exprs l ++ exprs r
-exprs (Or l r) = Or l r : exprs l ++ exprs r
-exprs (Cond l r) = Cond l r : exprs l ++ exprs r
-exprs (Bicond l r) = Bicond l r : exprs l ++ exprs r
-
 eval :: Expr -> Vals -> Bool
 eval (Var c) v = val c v
 eval (Not e) v = not . eval e $ v
@@ -62,3 +54,15 @@ eval (And l r) v = (eval l v) && (eval r v)
 eval (Or l r) v = (eval l v) || (eval r v)
 eval (Cond l r) v = (not $ eval l v) || (eval r v)
 eval (Bicond l r) v = (eval l v) == (eval r v)
+
+-- | flattens ast while keeping expressions logically intact.
+-- Unfortunately, because of linked list mechanics, it is more efficient to
+-- construct the list in reverse order, so this list must be reversed before
+-- being used for table headers
+exprs :: Expr -> [Expr]
+exprs (Var c) = [Var c]
+exprs (Not e) = Not e : exprs e
+exprs (And l r) = And l r : exprs l ++ exprs r
+exprs (Or l r) = Or l r : exprs l ++ exprs r
+exprs (Cond l r) = Cond l r : exprs l ++ exprs r
+exprs (Bicond l r) = Bicond l r : exprs l ++ exprs r
